@@ -49,7 +49,7 @@ public class Main {
         final StreamsBuilder builder = new StreamsBuilder();
 
         KStream<String, Tweet> tweets = builder.stream("tweets", Consumed.with(stringSerde, tweetSerde));
-''
+
         SentimentAnalysis sa = new SentimentAnalysis();
 
         KGroupedStream<String, TweetWithSentiment> tweetByName = tweets
@@ -64,7 +64,6 @@ public class Main {
                 .map((key, value) -> KeyValue.pair(value.getNick(), new TweetWithSentiment(value, sa.getSentiment(value.getBody()))))
                 .filter((key, value) -> value.getTweet().getBody().contains("#"))
                 .groupByKey(Grouped.with(stringSerde, tweetWithSentimentSerde));
-
 
         TimeWindowedKStream<String, TweetWithSentiment> TimewindowedTweetKStream = tweetByDate
                 .windowedBy(TimeWindows.of(Duration.ofSeconds(10)));
